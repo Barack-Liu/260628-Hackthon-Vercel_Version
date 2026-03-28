@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hongyang — Text Novel to Visual Novel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Hongyang</h1>
+      <p class="subtitle">Upload a text novel chapter. Get a playable visual novel.</p>
+    </header>
+
+    <!-- Upload section -->
+    <div id="upload-section">
+      <div class="upload-area" id="dropZone">
+        <div class="upload-icon">📄</div>
+        <p>Drag & drop a <strong>.txt</strong> file here</p>
+        <p class="small">or click to browse (max 10,000 characters)</p>
+        <input type="file" id="fileInput" accept=".txt" hidden />
+      </div>
+      <div id="fileInfo" class="file-info hidden">
+        <span id="fileName"></span>
+        <span id="charCount"></span>
+      </div>
+      <button id="generateBtn" class="btn" disabled onclick="generate()">
+        Generate Visual Novel
+      </button>
+    </div>
+
+    <!-- Progress section -->
+    <div id="progress-section" class="hidden">
+      <div class="progress-card">
+        <div class="spinner"></div>
+        <p id="statusText">Starting...</p>
+      </div>
+    </div>
+
+    <!-- Result section -->
+    <div id="result-section" class="hidden">
+      <div class="result-card">
+        <div class="result-icon">🎮</div>
+        <h2>Your Visual Novel is Ready!</h2>
+        <a id="playLink" href="#" target="_blank" class="btn btn-play">
+          ▶ Play Now
+        </a>
+        <button class="btn btn-secondary" onclick="reset()">Make Another</button>
+      </div>
+    </div>
+
+    <!-- Sponsor badges -->
+    <footer>
+      <div class="sponsors">
+        <span class="badge gmi">GMI Cloud</span>
+        <span class="badge dify">Dify</span>
+        <span class="badge hydra">HydraDB</span>
+        <span class="badge photon">Photon</span>
+        <span class="badge openclaw">OpenClaw</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    let fileText = '';
+
+    // File input handling
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) handleFile(fileInput.files[0]);
+    });
+
+    async function handleFile(file) {
+      if (!file.name.endsWith('.txt')) return alert('Please upload a .txt file');
+      fileText = await file.text();
+      if (fileText.length > 10000) return alert('File exceeds 10,000 characters');
+
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('charCount').textContent = `${fileText.length.toLocaleString()} chars`;
+      document.getElementById('fileInfo').classList.remove('hidden');
+      document.getElementById('generateBtn').disabled = false;
+    }
+
+    function showResult(vnUrl) {
+      document.getElementById('progress-section').classList.add('hidden');
+      document.getElementById('result-section').classList.remove('hidden');
+      document.getElementById('playLink').href = vnUrl;
+    }
+
+    async function generate() {
+      if (!fileText) return;
+
+      document.getElementById('upload-section').classList.add('hidden');
+      document.getElementById('progress-section').classList.remove('hidden');
+      document.getElementById('statusText').textContent = 'Generating visual novel — this may take up to 60 seconds...';
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: fileText })
+        });
+        const data = await res.json();
+
+        // Vercel returns the finished result directly (synchronous mode)
+        if (data.status === 'done') {
+          showResult(data.vnUrl);
+          return;
+        }
+        if (data.status === 'error') {
+          document.getElementById('statusText').textContent = 'Error: ' + data.statusText;
+          return;
+        }
+
+        // Local dev returns jobId for polling (async mode)
+        const jobId = data.jobId;
+        const poll = setInterval(async () => {
+          try {
+            const s = await fetch('/api/status/' + jobId).then(r => r.json());
+            document.getElementById('statusText').textContent = s.statusText;
+
+            if (s.status === 'done') {
+              clearInterval(poll);
+              showResult(s.vnUrl);
+            }
+            if (s.status === 'error') {
+              clearInterval(poll);
+              document.getElementById('statusText').textContent = 'Error: ' + s.statusText;
+            }
+          } catch (e) {
+            // Keep polling
+          }
+        }, 2000);
+      } catch (err) {
+        document.getElementById('statusText').textContent = 'Failed to start: ' + err.message;
+      }
+    }
+
+    function reset() {
+      fileText = '';
+      fileInput.value = '';
+      document.getElementById('fileInfo').classList.add('hidden');
+      document.getElementById('generateBtn').disabled = true;
+      document.getElementById('result-section').classList.add('hidden');
+      document.getElementById('upload-section').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
