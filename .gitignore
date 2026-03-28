@@ -1,0 +1,22 @@
+# API keys and secrets
+.env
+
+# Dependencies
+node_modules/
+
+# Generated output
+output/
+
+# Build artifacts
+dist/
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*

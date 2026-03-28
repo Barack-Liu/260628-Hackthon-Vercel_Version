@@ -1,0 +1,41 @@
+<Goal>
+I'm joining a hackthon. I have 3 hours. I want to build an agent which can convert text novel into visual novel. 
+
+Generate a Software Development Document based on the existing Product Requiremnt Document for me. It should be .md format. It should be billingual, which means one English paragraph followed by one Chiense paragraph.
+
+At this SDD, only focus on the phase 1 functions. Becasue I'm short of time.
+</Goal>
+
+<Hackthon details>
+https://luma.com/snixr7yb?tk=I0vpVP
+</Hackthon details>
+
+<Hackthon judges>
+1.GMI;
+2. Dify
+3. HydraDB
+4. Photon
+</Hackthon judges>
+
+<Input file location>
+'/Users/barack/Library/CloudStorage/OneDrive-Personal/251206-Meetup-Luma-Eventbrite-线下-活动/260328-Total Agent Recall/Product-Development-Document.md'
+</Input file location>
+
+<Output file location>
+'/Users/barack/Library/CloudStorage/OneDrive-Personal/251206-Meetup-Luma-Eventbrite-线下-活动/260328-Total Agent Recall/260328-SDD-P1.md'
+</Output file location>
+
+<Requirements>
+1. Since I need to build an agent, use OpenClaw as the framework.
+2. Since this is hackthon with judges, ensure use the technology stack that the judges companies are selling.
+3. No need to ask for my permission if you need to run some bash commands, scripts, etc. 
+4. Use Mermaid to draw the diagrams.
+5. Your PRD should divide the product into 3 phases. Because this is a time sentiive hackthon. I will finish the dev phase one by one. If time is enough, I can finish 3 phases. If time is not enough, I can only finish 1 phase.
+5. You should provide table of content. Because it's easy for navigation.
+6. For each section, it must be numberred, such as `1. xxx 1.1. xxx 1.1.1. xxx`, etc.
+7. To make it's easier to use, I hope this agent run on a web. I means, the end user just open a link on browser, such as `http://localhost:3000`, then the agent runs.
+8. The product name is `Hongyang`.
+9. At this project, for the sake of time, I dont wnat to make the visual novel into visual novel games, which means `解析器现在也提取 1–3 个决策点。VN 展示选项；每个选项通向不同的下一个场景。` Doesnt make sense. I wont allow the end user to choose the story flow.
+10. Again, this is a hackthon project, keep the judges in your mind. It means in phase 1, you should use all technology stack that the judges companies are selling, rather than waiting for phase 2 or phase 3. Because, in the worst case, I may only be able to finish phase 1.
+11. In phase 2, I want to have background music, sound effect, and character voices. But in phase 1, it's ok to only have background images, character portraits, dialogue texts, etc.
+</Requirements>
